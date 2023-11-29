@@ -11,5 +11,6 @@ namespace NewsBlog.Models
         {
             Database.EnsureCreated();
         }
+        public DbSet<Category> Categories { get; set; }
     }
 }
