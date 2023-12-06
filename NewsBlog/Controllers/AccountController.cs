@@ -39,7 +39,7 @@ namespace AnimeTitlesApp.Controllers
                     FirstName = model.FirstName,
                     Email = model.Email,
                     UserName = model.Email,
-                    DateOfBirthday = DateTime.Now
+                    DateOfRegistration = DateTime.Now
                 };
 
                 // добавляем пользователя

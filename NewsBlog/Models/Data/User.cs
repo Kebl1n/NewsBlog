@@ -14,9 +14,9 @@ namespace NewsBlog.Models.Data
         [Display(Name = "Имя")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Введите день рождения")]
-        [Display(Name = "День Рождения")]
-        public DateTime DateOfBirthday { get; set; }
+        [Required(ErrorMessage = "")]
+        [Display(Name = "Дата Регистрации")]
+        public DateTime DateOfRegistration { get; set; }
 
 
 
