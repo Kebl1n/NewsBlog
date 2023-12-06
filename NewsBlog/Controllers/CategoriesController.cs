@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NewsBlog.Models;
 using NewsBlog.Models.Data;
+using NewsBlog.Viewmodels.FormsOfCategory;
 
 namespace NewsBlog.Controllers
 {
@@ -28,9 +30,9 @@ namespace NewsBlog.Controllers
         public async Task<IActionResult> Index()
         {
             var appCtx = _context.Categories
-            .OrderBy(f => f.FormOfCategory);
+                .OrderBy(f => f.FormOfCategory);
               return _context.Categories != null ? 
-                          View(await _context.Categories.ToListAsync()) :
+                          View(await appCtx.ToListAsync()) :
                           Problem("Entity set 'AppCtx.Categories'  is null.");
         }
 
@@ -63,15 +65,26 @@ namespace NewsBlog.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FormOfCategory")] Category category)
+        public async Task<IActionResult> Create(CreateFormOfCategory model)
         {
+            if (_context.Categories
+                .Where(f => f.FormOfCategory == model.FormOfCategory)
+                .FirstOrDefault() != null)
+            {
+                ModelState.AddModelError("", "Введеная категория уже существует");
+            }
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                Category genre = new()
+                {
+                    FormOfCategory = model.FormOfCategory
+                };
+
+                _context.Add(genre);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(model);
         }
 
         // GET: Categories/Edit/5
@@ -87,16 +100,28 @@ namespace NewsBlog.Controllers
             {
                 return NotFound();
             }
-            return View(category);
+            EditFormsOfCategory model = new()
+            {
+                Id = category.Id,
+                FormOfCategory = category.FormOfCategory
+            };
+            return View(model);
         }
 
         // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, [Bind("Id,FormOfCategory")] Category category)
+        public async Task<IActionResult> Edit(short id, EditFormsOfCategory model)
         {
+            if (_context.Categories
+               .Where(f => f.FormOfCategory == model.FormOfCategory)
+               .FirstOrDefault() != null)
+            {
+                ModelState.AddModelError("", "Введеная категория уже существует");
+            }
+
+            Category category = await _context.Categories.FindAsync(id);
+
             if (id != category.Id)
             {
                 return NotFound();
@@ -106,6 +131,7 @@ namespace NewsBlog.Controllers
             {
                 try
                 {
+                    category.FormOfCategory = model.FormOfCategory;
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -122,7 +148,7 @@ namespace NewsBlog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(model);
         }
 
         // GET: Categories/Delete/5

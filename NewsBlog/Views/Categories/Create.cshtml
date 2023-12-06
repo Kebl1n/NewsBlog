@@ -1,23 +1,23 @@
-﻿@model NewsBlog.Models.Data.Category
+﻿@model NewsBlog.Viewmodels.FormsOfCategory.CreateFormOfCategory
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "СозданиеКатегории";
 }
 
-<nav aria-label="breadcrumb">
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <a asp-controller="Home" asp-action="Index">Главная</a></li>
-        <li> / </li>
         <li class="breadcrumb-item"> <a asp-controller="Categories" asp-action="Index">Категории</a></li>
-        <li> / </li>
         <li class="breadcrumb-item" active> Создание</li>
     </ol>
 </nav>
 <h3>
     <a class="btn text-dark" asp-action="Index" title="Вернуться к списку">
-        <i class="fas fa-arrow-left"></i> Вернуться к списку
+        <i class="fas fa-arrow-left"></i>
     </a>
+    Добавление категории
 </h3>
+<hr />
 
 <div class="row">
     <div class="col-md-5">

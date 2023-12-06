@@ -1,27 +1,26 @@
 ﻿@model NewsBlog.Models.Data.Category
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "УдалениеКатегории";
 }
 
-<nav aria-label="breadcrumb">
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"> <a asp-controller="Home" asp-action="Index">Главная</a></li>
-        <li>  /  </li>
         <li class="breadcrumb-item"> <a asp-controller="Categories" asp-action="Index">Категории</a></li>
-        <li>  /  </li>
         <li class="breadcrumb-item" active>Удаление</li>
     </ol>
 </nav>
 <h3>
     <a class="btn text-dark" asp-action="Index" title="Вернуться к списку">
-        <i class="fas fa-arrow-left"></i> Вернуться к списку
+        <i class="fas fa-arrow-left"></i>
     </a>
+    Удаление категории
 </h3>
+<hr />
 
 <h4>Вы уверены что хотите удалить данную категорию?</h4>
 <div>
-    <hr />
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.FormOfCategory)
@@ -33,6 +32,6 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" />
+        <input type="submit" value="Удалить" class="btn btn-danger" />
     </form>
 </div>

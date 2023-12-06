@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NewsBlog.Models.FormsOfCategory
+namespace NewsBlog.Viewmodels.FormsOfCategory
 {
-    public class CreateFormOfCategory
+    public class EditFormsOfCategory
     {
+        public short Id { get; set; }
+
         [Required(ErrorMessage = "Введите категорию")]
         [Display(Name = "Категория")]
         public required string FormOfCategory { get; set; }
