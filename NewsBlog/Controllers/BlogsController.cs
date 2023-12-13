@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NewsBlog.Models;
 using NewsBlog.Models.Data;
+using NewsBlog.Viewmodels.BlogsOfForm;
 
 namespace NewsBlog.Controllers
 {
@@ -21,7 +22,7 @@ namespace NewsBlog.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            var appCtx = _context.Blogs;
+            var appCtx = _context.Blogs.Include(i => i.Category);
             // возвращаем в представление полученный список записей
             return View(await appCtx.ToListAsync());
         }
@@ -36,7 +37,6 @@ namespace NewsBlog.Controllers
             }
 
             var blog = await _context.Blogs
-                .Include(b => b)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (blog == null)
             {
@@ -54,20 +54,38 @@ namespace NewsBlog.Controllers
         }
 
         // POST: Blogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Text,Date,IdUser")] Blog blog)
+        public async Task<IActionResult> Create(CreateFormOfBlog model)
         {
-            if (ModelState.IsValid)
-            {
+            //if (_context.Blogs
+            //    .Where(f => f.Title == model.Title)
+            //    .FirstOrDefault() != null)
+            //{
+            //    ModelState.AddModelError("", "Введеная новость уже существует");
+            //}
+
+
+            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory", model);
+
+            //if (ModelState.IsValid)
+            //{
+            Blog blog = new()
+                {
+                    Title = model.Title,
+                    Text = model.Text,
+                    IdCategory = model.IdCategory,
+                    Id = model.Id,
+                    Date = DateTime.Now
+                };
+
                 _context.Add(blog);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory", blog);
-            return View(blog);
+            //}
+        
+        //return View(model);
         }
 
         // GET: Blogs/Edit/5
@@ -78,21 +96,36 @@ namespace NewsBlog.Controllers
                 return NotFound();
             }
 
-            var blog = await _context.Blogs.FindAsync(id);
-            if (blog == null)
+            var category = await _context.Blogs.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
-            return View(blog);
+            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory");
+            EditFormOfBlog model = new()
+            {
+                Id = category.Id,
+                Title = category.Title,
+                Text = category.Text,
+                IdCategory = category.IdCategory,
+            };
+            return View(model);
         }
 
         // POST: Blogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, [Bind("Id,Title,Text,Date,IdUser")] Blog blog)
+        public async Task<IActionResult> Edit(short id, EditFormOfBlog model)
         {
+            //if (_context.Blogs
+            //    .Where(f => f.Title == model.Title)
+            //    .FirstOrDefault() != null)
+            //{
+            //    ModelState.AddModelError("", "Введеная новость уже существует");
+            //}
+
+            Blog blog = await _context.Blogs.FindAsync(id);
+
             if (id != blog.Id)
             {
                 return NotFound();
@@ -102,12 +135,15 @@ namespace NewsBlog.Controllers
             {
                 try
                 {
+                    blog.Title = model.Title;
+                    blog.Text = model.Text;
+                    blog.IdCategory = model.IdCategory;
                     _context.Update(blog);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BlogExists(blog.Id))
+                    if (!CategoryExists(blog.Id))
                     {
                         return NotFound();
                     }
@@ -118,7 +154,12 @@ namespace NewsBlog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(blog);
+            return View(model);
+        }
+
+        private bool CategoryExists(short id)
+        {
+            return (_context.Blogs?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
         // GET: Blogs/Delete/5
@@ -129,15 +170,14 @@ namespace NewsBlog.Controllers
                 return NotFound();
             }
 
-            var blog = await _context.Blogs
-                .Include(b => b)
+            var category = await _context.Blogs
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (blog == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(blog);
+            return View(category);
         }
 
         // POST: Blogs/Delete/5
@@ -147,21 +187,18 @@ namespace NewsBlog.Controllers
         {
             if (_context.Blogs == null)
             {
-                return Problem("Entity set 'AppCtx.Blogs'  is null.");
+                return Problem("Entity set 'AppCtx.Categories'  is null.");
             }
-            var blog = await _context.Blogs.FindAsync(id);
-            if (blog != null)
+            var category = await _context.Blogs.FindAsync(id);
+            if (category != null)
             {
-                _context.Blogs.Remove(blog);
+                _context.Blogs.Remove(category);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BlogExists(short id)
-        {
-          return (_context.Blogs?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        
     }
 }

@@ -1,37 +1,37 @@
-using System.ComponentModel.DataAnnotations;
+п»їusing System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NewsBlog.Models.Data;
 
-namespace NewsBlog.Models.Data
+namespace NewsBlog.Viewmodels.BlogsOfForm
 {
-    public class Blog
+    public class CreateFormOfBlog
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Display(Name = "ИД")]
+        [Display(Name = "РР”")]
         public short Id { get; set; }
 
 
-        [Required(ErrorMessage = "Введите название новости")]
-        [Display(Name = "Заголовок новости")]
+        [Required(ErrorMessage = "Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РЅРѕРІРѕСЃС‚Рё")]
+        [Display(Name = "Р—Р°РіРѕР»РѕРІРѕРє РЅРѕРІРѕСЃС‚Рё")]
         public required string Title { get; set; }
 
-        [Required(ErrorMessage = "Введите текст")]
-        [Display(Name = "Текст новости")]
+        [Required(ErrorMessage = "Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚")]
+        [Display(Name = "РўРµРєСЃС‚ РЅРѕРІРѕСЃС‚Рё")]
         public required string Text { get; set; }
 
-        [Required(ErrorMessage = "")]
-        [Display(Name = "Дата публикации")]
+        [Display(Name = "Р”Р°С‚Р° РїСѓР±Р»РёРєР°С†РёРё")]
         public DateTime Date { get; set; }
 
         public void CreateField()
         {
             Date = DateTime.Now;
         }
-        //навигационные св-ва
+        //РЅР°РІРёРіР°С†РёРѕРЅРЅС‹Рµ СЃРІ-РІР°
         [Required]
-        [Display(Name = "Категория")]
+        [Display(Name = "РљР°С‚РµРіРѕСЂРёСЏ")]
         public short IdCategory { get; set; }
 
-        [Display(Name = "Категория")]
+        [Display(Name = "РљР°С‚РµРіРѕСЂРёСЏ")]
         [ForeignKey("IdCategory")]
         public Category Category { get; set; }
 
