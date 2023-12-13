@@ -14,5 +14,7 @@ namespace NewsBlog.Models.Data
         [Display(Name ="Категория")]
         public required string FormOfCategory {  get; set; }
 
+        // Навигационные свойства
+        public ICollection<Blog> Blog { get; set; }
     }
 }

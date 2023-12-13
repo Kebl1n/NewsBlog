@@ -30,12 +30,14 @@
                         <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Категории</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="Index">Новости</a>
+                        </li>
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <p>@User.Identity.Name</p>
-
+                            <p  class="nav-link text-dark">@User.Identity.Name</p>
                             <form method="post" asp-controller="Account" asp-action="Logout">
-                                <input type="submit" value="Выход" />
+                                <input class="nav-link text-dark form-control-plaintext" type="submit" value="Выход" />
                             </form>
                         }
                         else{
