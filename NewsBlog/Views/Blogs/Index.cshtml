@@ -1,0 +1,65 @@
+﻿@model IEnumerable<NewsBlog.Models.Data.Blog>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"> <a asp-controller="Home" asp-action="Index">Главная</a></li>
+        <li class="breadcrumb-item" active>Новости</li>
+    </ol>
+</nav>
+
+
+<h2>
+    Новости
+</h2>
+
+
+<h6>
+    <a class="btn text-dark" asp-action="Create">
+        <i class="far fa-plus-square"></i> Добавить новость
+    </a>
+</h6>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <td>
+                @Html.DisplayNameFor(model => model.IdCategory)
+            </td>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdCategory)
+            </td>
+                <td>
+                    <a class="btn text-dark" asp-action="Edit" asp-route-id="@item.Id" title="Редактировать"><i class="fas fa-pencil-alt"></i></a> |
+                    <a class="btn text-dark" asp-action="Details" asp-route-id="@item.Id" title="Подробнее"><i class="far fa-eye "></i></a> |
+                    <a class="btn text-dark" asp-action="Delete" asp-route-id="@item.Id" title="Удалить"><i class="fas fa-minus-square"></i></a>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

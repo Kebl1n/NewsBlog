@@ -18,9 +18,5 @@ namespace NewsBlog.Models.Data
         [Display(Name = "Дата Регистрации")]
         public DateTime DateOfRegistration { get; set; }
 
-
-
-
-        //навигационные свойства
     }
 }
