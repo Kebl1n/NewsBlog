@@ -23,20 +23,29 @@
         <i class="far fa-plus-square"></i> Добавить новость
     </a>
 </h6>
+<h6>
+    <form method="post" action="">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Фильтр категорий..." name="SearchString" value="@ViewData["CurrentFilter"]">
+            <button class="btn btn-outline-secondary" type="submit">Найти</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Вернуться к полному списку</a>
+        </div>
+    </form>
+</h6>
 <table class="table">
     <thead>
         <tr>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.TitleSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Заголовок</a>
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewBag.TitleSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Заголовок</a>
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.TextSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Текст</a>
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewBag.TextSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Текст</a>
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.DateOfSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Дата публикации</a>
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewBag.DateOfSort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Дата публикации</a>
             </th>
             <td>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.CategorySort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Категория</a>
+                <a class="text-decoration-none text-reset" asp-action="Index" asp-route-sortOrder="@ViewBag.CategorySort" asp-route-currentFilter="@ViewData["CurrentFilter"]">Категория</a>
             </td>
             <th></th>
         </tr>

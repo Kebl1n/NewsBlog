@@ -29,7 +29,7 @@ namespace NewsBlog.Controllers
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                orders = orders.Where(s => s.Category.FormOfCategory.Contains(searchString)); // Предполагаем, что категория имеет свойство Name
+                orders = orders.Where(s => s.Category.FormOfCategory.Contains(searchString));
             }
 
             ViewData["TitleSort"] = sortOrder == BlogOfStudySort.TitleOfEduAsc ? BlogOfStudySort.TitleOfEduDesc : BlogOfStudySort.TitleOfEduAsc;
