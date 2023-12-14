@@ -5,26 +5,54 @@ using Microsoft.EntityFrameworkCore;
 using NewsBlog.Models;
 using NewsBlog.Models.Data;
 using NewsBlog.Viewmodels.BlogsOfForm;
+using PagedList.Mvc;
+using PagedList;
 
 namespace NewsBlog.Controllers
 {
     public class BlogsController : Controller
     {
         private readonly AppCtx _context;
-        private readonly UserManager<User> _userManager;
 
-        public BlogsController(AppCtx context, UserManager<User> user)
+
+        public BlogsController(AppCtx context)
         {
             _context = context;
-            _userManager = user;
         }
 
         // GET: Categories
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? pageNumber, string searchString, BlogOfStudySort sortOrder = BlogOfStudySort.TitleOfEduAsc)
         {
-            var appCtx = _context.Blogs.Include(i => i.Category);
-            // возвращаем в представление полученный список записей
-            return View(await appCtx.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+            var orders = from s in _context.Blogs.Include(i => i.Category)
+                         select s;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                orders = orders.Where(s => s.Category.FormOfCategory.Contains(searchString)); // Предполагаем, что категория имеет свойство Name
+            }
+
+            ViewData["TitleSort"] = sortOrder == BlogOfStudySort.TitleOfEduAsc ? BlogOfStudySort.TitleOfEduDesc : BlogOfStudySort.TitleOfEduAsc;
+            ViewData["TextSort"] = sortOrder == BlogOfStudySort.TextOfEduAsc ? BlogOfStudySort.TextOfEduDesc : BlogOfStudySort.TextOfEduAsc;
+            ViewData["DateOfSort"] = sortOrder == BlogOfStudySort.DateOfBlogAsc ? BlogOfStudySort.DateOfBlogDesc : BlogOfStudySort.DateOfBlogAsc;
+            ViewData["CategorySort"] = sortOrder == BlogOfStudySort.CategoryOfAsc ? BlogOfStudySort.CategoryOfDesc : BlogOfStudySort.CategoryOfAsc;
+
+            // Сортировка
+            orders = sortOrder switch
+            {
+                BlogOfStudySort.TitleOfEduAsc => orders.OrderBy(s => s.Title),
+                BlogOfStudySort.TitleOfEduDesc => orders.OrderByDescending(s => s.Title),
+                BlogOfStudySort.TextOfEduAsc => orders.OrderBy(s => s.Text), // Предполагаем, что у вас есть свойство Text в модели
+                BlogOfStudySort.TextOfEduDesc => orders.OrderByDescending(s => s.Text),
+                BlogOfStudySort.DateOfBlogAsc => orders.OrderBy(s => s.Date),
+                BlogOfStudySort.DateOfBlogDesc => orders.OrderByDescending(s => s.Date),
+                BlogOfStudySort.CategoryOfAsc => orders.OrderBy(s => s.IdCategory),
+                BlogOfStudySort.CategoryOfDesc => orders.OrderByDescending(s => s.IdCategory),
+
+            };
+
+            int pageSize = 3;
+            return View(await PaginatedList<Blog>.CreateAsync(orders.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
 
@@ -96,19 +124,26 @@ namespace NewsBlog.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Blogs.FindAsync(id);
-            if (category == null)
+            var blog = await _context.Blogs.FindAsync(id);
+            if (blog == null)
             {
                 return NotFound();
             }
-            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory");
-            EditFormOfBlog model = new()
+
+            // Создаем SelectList для dropdown, содержащего категории, и передаем его в ViewBag
+            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory", blog.IdCategory);
+
+            // Создаем экземпляр модели представления, заполненный данными из бд
+            EditFormOfBlog model = new EditFormOfBlog
             {
-                Id = category.Id,
-                Title = category.Title,
-                Text = category.Text,
-                IdCategory = category.IdCategory,
+                Id = blog.Id,
+                Title = blog.Title,
+                Text = blog.Text,
+                IdCategory = blog.IdCategory,
+                // Здесь нужно добавить другие свойства, если они есть в EditFormOfBlog
             };
+
+            // Возвращаем модель представления вместе с данными во view для редактирования
             return View(model);
         }
 
@@ -117,33 +152,32 @@ namespace NewsBlog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(short id, EditFormOfBlog model)
         {
-            //if (_context.Blogs
-            //    .Where(f => f.Title == model.Title)
-            //    .FirstOrDefault() != null)
-            //{
-            //    ModelState.AddModelError("", "Введеная новость уже существует");
-            //}
-
-            Blog blog = await _context.Blogs.FindAsync(id);
-
-            if (id != blog.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
+                    var blog = await _context.Blogs.FindAsync(id);
+                    if (blog == null)
+                    {
+                        return NotFound();
+                    }
                     blog.Title = model.Title;
                     blog.Text = model.Text;
                     blog.IdCategory = model.IdCategory;
-                    _context.Update(blog);
+
+                    _context.Blogs.Update(blog);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index)); // Предполагается, что Index — это метод представления списка блогов.
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(blog.Id))
+                    if (!BlogExists(model.Id))
                     {
                         return NotFound();
                     }
@@ -152,14 +186,16 @@ namespace NewsBlog.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
+            //}
+
+            // Если ModelState невалиден, возвращаем пользователя обратно на форму редактирования
+            ViewData["IdCategory"] = new SelectList(_context.Categories, "Id", "FormOfCategory", model.IdCategory);
             return View(model);
         }
 
-        private bool CategoryExists(short id)
+        private bool BlogExists(short id)
         {
-            return (_context.Blogs?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _context.Blogs.Any(e => e.Id == id);
         }
 
         // GET: Blogs/Delete/5

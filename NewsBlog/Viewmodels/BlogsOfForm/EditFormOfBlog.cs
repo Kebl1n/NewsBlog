@@ -23,10 +23,6 @@ namespace NewsBlog.Viewmodels.BlogsOfForm
         [Display(Name = "Дата публикации")]
         public DateTime Date { get; set; }
 
-        public void CreateField()
-        {
-            Date = DateTime.Now;
-        }
         //навигационные св-ва
         [Required]
         [Display(Name = "Категория")]
